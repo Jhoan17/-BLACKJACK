@@ -1,12 +1,17 @@
-const btnNewGame = document.querySelector('#btnNewGame');
-const btnAsk = document.querySelector('#btnAsk');
-const btnDetain = document.querySelector('#btnDetain');
-const divCards = document.querySelectorAll('.divCards');
-const pointSmalls = document.querySelectorAll('.pointSmalls');
+const btnNewGame = document.querySelector('#btnNewGame'),
+  btnAsk = document.querySelector('#btnAsk'),
+  btnDetain = document.querySelector('#btnDetain'),
+  divCards = document.querySelectorAll('.divCards'),
+  pointSmalls = document.querySelectorAll('.pointSmalls');
 
 let deckCards = [];
-let point = [0, 0];
-let shift = [];
+let point = [];
+
+const fillPlayer = (player = 2) => {
+  for (let i = 0; i < player; i++) {
+    point.push(0);
+  }
+};
 
 const fillDeckCards = () => {
   const typesCards = ['C', 'D', 'H', 'S'];
@@ -19,7 +24,6 @@ const fillDeckCards = () => {
       deckCards.push(lyricCard + typeCard);
     }
   }
-  //   console.log(deckCards);
 };
 
 const askCard = () => {
@@ -42,29 +46,20 @@ const askCard = () => {
 const pointCounter = (pointAsk, shift) => {
   point[shift] = pointAsk + point[shift];
   pointSmalls[shift].innerHTML = point[shift];
-  if (shift != 1) {
-    if (point[shift] > 21) {
-      btnNewGame.disabled = false;
-      btnAsk.disabled = true;
-      btnDetain.disabled = true;
-      computerShift();
-      setTimeout(() => {
-        validatePoint();
-      }, 150);
-    }
-  }
 };
 
 const validatePoint = () => {
-  if (point[0] < 21 && point[0] < point[1]) {
-    if (point[1] <= 21) {
+  setTimeout(() => {
+    if (point[0] === point[1]) {
+      alert('Empate!!!');
+    } else if (point[0] > 21) {
       alert('Perdiste!!!');
-    } else {
+    } else if (point[1] > 21) {
       alert('Ganaste!!!');
+    } else {
+      alert('Perdiste!!!');
     }
-  } else {
-    alert('Perdiste!!!');
-  }
+  }, 150);
 };
 
 const paintCard = (card, shift) => {
@@ -78,7 +73,7 @@ const paintCard = (card, shift) => {
 
 const computerShift = () => {
   const pointer = point[0] > 21 ? 1 : point[0];
-  console.log(pointer);
+
   while (point[1] <= pointer) {
     const cardPoint = askCard();
     paintCard(cardPoint.card, 1);
@@ -86,33 +81,44 @@ const computerShift = () => {
   }
 };
 
+const newGame = () => {
+  deckCards = [];
+  point = [];
+  divCards[0].innerHTML = '';
+  divCards[1].innerHTML = '';
+  pointSmalls[0].innerHTML = 0;
+  pointSmalls[1].innerHTML = 0;
+  btnNewGame.disabled = true;
+  btnAsk.disabled = false;
+  btnDetain.disabled = true;
+  fillDeckCards();
+  fillPlayer(2);
+};
+
 const events = () => {
   btnNewGame.addEventListener('click', (event) => {
-    deckCards = [];
-    point = [0, 0];
-    divCards[0].innerHTML = '';
-    divCards[1].innerHTML = '';
-    pointSmalls[0].innerHTML = 0;
-    pointSmalls[1].innerHTML = 0;
-    btnNewGame.disabled = true;
-    btnAsk.disabled = false;
-    btnDetain.disabled = false;
-    fillDeckCards();
+    newGame();
   });
   btnAsk.addEventListener('click', (event) => {
-    // console.log(askCard().card);
     const cardPoint = askCard();
     paintCard(cardPoint['card'], 0);
     pointCounter(parseInt(cardPoint['point']), 0);
+    btnDetain.disabled = false;
+
+    if (point[0] >= 21) {
+      validatePoint();
+      computerShift();
+      btnNewGame.disabled = false;
+      btnAsk.disabled = true;
+      btnDetain.disabled = true;
+    }
   });
   btnDetain.addEventListener('click', (event) => {
     computerShift();
     btnNewGame.disabled = false;
     btnAsk.disabled = true;
     btnDetain.disabled = true;
-    setTimeout(() => {
-      validatePoint();
-    }, 150);
+    validatePoint();
   });
 };
 
