@@ -45,7 +45,9 @@ const askCard = () => {
 
 const pointCounter = (pointAsk, shift) => {
   point[shift] = pointAsk + point[shift];
-  pointSmalls[shift].innerHTML = point[shift];
+  setTimeout(() => {
+    pointSmalls[shift].innerHTML = point[shift];
+  }, 200);
 };
 
 const validatePoint = () => {
@@ -59,7 +61,7 @@ const validatePoint = () => {
     } else {
       alert('Perdiste!!!');
     }
-  }, 150);
+  }, 200);
 };
 
 const paintCard = (card, shift) => {
